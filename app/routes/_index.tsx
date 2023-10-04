@@ -1,6 +1,6 @@
 import type {
   MetaFunction,
-  LoaderFunctionArgs,
+  LoaderFunctionArgs, HeadersFunction,
 } from "@remix-run/cloudflare";
 
 import { useLoaderData } from '@remix-run/react';
@@ -9,7 +9,6 @@ import { json } from '@remix-run/cloudflare';
 const createPostsURL = (url: string, page: number, perPage: number) => {
   return `${url}/wp-json/wp/v2/posts/?_embed&page=${page}&per_page=${perPage}`;
 }
-
 const fetchPosts = async (url: string) => {
   const perPage = 100;
   let currentPage = 1;
@@ -23,6 +22,13 @@ const fetchPosts = async (url: string) => {
   }
   while (totalPages > currentPage++);
   return posts;
+}
+
+export const headers: HeadersFunction = () => {
+  return {
+    "X-Stretchy-Pants": "its for fun",
+    "Cache-Control": "max-age=0, s-maxage=300, stale-while-revalidate=300",
+  };
 }
 
 export const meta: MetaFunction = () => {
