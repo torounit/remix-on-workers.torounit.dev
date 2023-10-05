@@ -7,9 +7,8 @@ declare module "__STATIC_CONTENT_MANIFEST" {
   export default manifest;
 }
 
-declare module "@remix-run/server-runtime" {
-  export interface AppLoadContext {
-    WORDPRESS_URL: string;
-    POSTS: KVNamespace;
-  }
+interface Env {
+  WORDPRESS_URL: string;
+  POSTS: KVNamespace;
 }
+

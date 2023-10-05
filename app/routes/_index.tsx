@@ -3,33 +3,11 @@ import type {
   LoaderFunctionArgs,
 } from "@remix-run/cloudflare";
 
-import { useLoaderData } from '@remix-run/react';
+import { Link, useLoaderData } from '@remix-run/react';
 import { json } from '@remix-run/cloudflare';
-import type { WP_REST_API_Posts , WP_REST_API_Post } from 'wp-types';
-
-const createPostsURL = (url: string, page: number, perPage: number) => {
-  return `${url}/wp-json/wp/v2/posts/?_embed&page=${page}&per_page=${perPage}`;
-}
-const fetchPosts = async (url: string) => {
-  const perPage = 100;
-  let currentPage = 1;
-  let totalPages = 1;
-  let posts: WP_REST_API_Posts = [];
-  do {
-    const request = new Request(createPostsURL(url, currentPage, perPage));
-    const response = await fetch(request, {
-      cf: {
-        cacheKey: request.url,
-        cacheEverything: true,
-      },
-    });
-    totalPages = Number(response.headers.get("X-WP-TotalPages"));
-    const data = await response.json<WP_REST_API_Posts>();
-    posts = posts.concat(data);
-  }
-  while (totalPages > currentPage++);
-  return posts;
-}
+import type { WP_REST_API_Post, WP_REST_API_Posts } from 'wp-types';
+import { getAllPosts } from '~/lib/posts';
+import KVStore from '~/lib/Store/KVStore';
 
 export const meta: MetaFunction = () => {
   return [
@@ -38,31 +16,26 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ context }: LoaderFunctionArgs) => {
-
-  const POSTS = context.env.POSTS;
-  const posts = await POSTS.get<typeof fetchedPosts>("posts", "json");
-  if (posts) {
-    return json({ posts });
-  }
-
-  const fetchedPosts = await fetchPosts(context.env.WORDPRESS_URL);
-
-  await POSTS.put("posts", JSON.stringify(fetchedPosts), { expirationTtl: 60 * 5 });
-  return json({ posts: fetchedPosts });
+  const store = new KVStore((context.env as Env).POSTS);
+  const posts = await getAllPosts((context.env as Env).WORDPRESS_URL, store);
+  return json({ posts });
 };
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();
+  const posts = data?.posts as WP_REST_API_Posts | undefined;
   return (
     <div>
       <h1>Posts</h1>
-      {data?.posts ? (
+      {posts ? (
         <ul>
-          {data?.posts.map((post: WP_REST_API_Post) => (
-            <li key={post.id}>{post.title.rendered}</li>
+          {posts.map((post: WP_REST_API_Post) => (
+            <li key={post.id}>
+              <Link to={`/${post.id}`}>{post.title.rendered}</Link>
+            </li>
           ))}
         </ul>
-      ): <div>Nothing.</div>}
+      ) : <div>Nothing.</div>}
 
     </div>
   );
