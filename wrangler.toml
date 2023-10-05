@@ -3,6 +3,7 @@ workers_dev = true
 main = "./build/index.js"
 # https://developers.cloudflare.com/workers/platform/compatibility-dates
 compatibility_date = "2023-04-20"
+
 kv_namespaces = [
   { binding = "POSTS", id = "cd19a6e249894b7aaabe4728882832b6" }
 ]

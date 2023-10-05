@@ -6,3 +6,10 @@ declare module "__STATIC_CONTENT_MANIFEST" {
   const manifest: string;
   export default manifest;
 }
+
+declare module "@remix-run/server-runtime" {
+  export interface AppLoadContext {
+    WORDPRESS_URL: string;
+    POSTS: KVNamespace;
+  }
+}
