@@ -8,20 +8,28 @@ const createPostsURL = (url: string, page: number, perPage: number) => {
 export const fetchPosts = async (url: string) => {
   const perPage = 100;
   let currentPage = 1;
-  let totalPages = 1;
   let posts: WP_REST_API_Posts = [];
-  do {
-    const request = new Request(createPostsURL(url, currentPage, perPage));
-    const response = await fetch(request, {
-      cf: {
-        cacheKey: request.url,
-        cacheEverything: true,
-      },
-    });
-    totalPages = Number(response.headers.get("X-WP-TotalPages"));
-    const data = await response.json<WP_REST_API_Posts>();
-    posts = posts.concat(data);
-  } while (totalPages > currentPage++);
+
+  const request = new Request(createPostsURL(url, currentPage, perPage));
+  const response = await fetch(request, {});
+  const totalPages = Number(response.headers.get("X-WP-TotalPages"));
+  const data = await response.json<WP_REST_API_Posts>();
+  posts = posts.concat(data);
+
+  let results: Promise<Response>[] = [];
+  for ( let nextPage = 2; nextPage <= totalPages; nextPage++ ) {
+    const nextRequest = new Request(createPostsURL(url, nextPage, perPage));
+    const result = fetch(nextRequest, {});
+    results = [ ...results, result ];
+  }
+
+  const responses = await Promise.all( results );
+
+  for ( const nextResponse of responses ) {
+    const nextResults = await nextResponse.json<WP_REST_API_Posts>();
+    posts = posts.concat( nextResults );
+  }
+
   return posts;
 };
 
