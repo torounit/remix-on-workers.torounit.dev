@@ -17,7 +17,7 @@ export default {
     env: {
       __STATIC_CONTENT: Fetcher;
     },
-    ctx: ExecutionContext
+    ctx: ExecutionContext,
   ): Promise<Response> {
     try {
       const url = new URL(request.url);
@@ -36,7 +36,7 @@ export default {
             browserTTL: ttl,
             edgeTTL: ttl,
           },
-        }
+        },
       );
     } catch (error) {}
 

@@ -11,4 +11,3 @@ interface Env {
   WORDPRESS_URL: string;
   POSTS: KVNamespace;
 }
-
