@@ -7,7 +7,7 @@ export default class KVStore implements Store {
 
   constructor(
     KV: KVNamespace,
-    options: KVNamespacePutOptions = { expirationTtl: 60 * 5 },
+    options: KVNamespacePutOptions = {},
   ) {
     this.KV = KV;
     this.options = options;

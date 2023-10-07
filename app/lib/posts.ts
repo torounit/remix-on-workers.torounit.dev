@@ -25,6 +25,14 @@ export const fetchPosts = async (url: string) => {
   return posts;
 };
 
+export const loadPostsToStore = async (
+  WP_URL: string,
+  store: Store,
+) => {
+  const posts = await getAllPosts(WP_URL, store);
+  await store.set("posts", posts);
+}
+
 export const getAllPosts = async (
   WP_URL: string,
   store: Store | undefined,

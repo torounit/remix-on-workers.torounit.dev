@@ -16,3 +16,6 @@ kv_namespaces = [
 
 [vars]
 WORDPRESS_URL="https://torounit.com"
+
+[triggers]
+crons = ["*/5 * * * *"]
