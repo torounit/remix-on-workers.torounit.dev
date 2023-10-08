@@ -15,7 +15,7 @@ kv_namespaces = [
   command = "npm run build"
 
 [vars]
-WORDPRESS_URL="https://torounit.com"
+WORDPRESS_URL="https://wordpress.org/news/"
 
 [triggers]
-crons = ["*/5 * * * *"]
+crons = ["*/10 * * * *"]
